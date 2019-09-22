@@ -19,8 +19,8 @@ def t_find_by_template():
     }
 
     key_cols = ['playerID', 'teamID', 'yearID', 'stint']
-    fields = ['playerID', 'teamID', 'yearID', 'AB', 'H', 'HR', 'RBI']
-    tmp = {'teamID': 'BOS', 'yearID': '1960'}
+    fields = ['playerID']
+    tmp = {'teamID': 'CHN', 'yearID': '1890', 'HBP': '2'}
 
     csv_tbl = CSVDataTable("batting", connect_info, key_columns=key_cols)
 
@@ -37,7 +37,7 @@ def t_find_by_primary_key():
 
     key_cols = ['playerID', 'teamID', 'yearID', 'stint']
     fields = ['playerID', 'teamID', 'yearID', 'AB', 'H', 'HR', 'RBI']
-    key_vals = ['willite01', 'BOS', '1960', '1']
+    key_vals = ['willite01', 'BOS', '1940', '1']
 
     csv_tbl = CSVDataTable("batting", connect_info, key_columns=key_cols)
 
@@ -57,6 +57,7 @@ def t_insert():
     new_rec = {'playerID': 'cl3910', 'teamID': 'CU', 'yearID': '2019'}
 
     csv_tbl = CSVDataTable("batting", connect_info, key_columns=key_cols)
+
     csv_tbl.insert(new_record=new_rec)
 
     res = csv_tbl.find_by_template(template=new_rec, field_list=fields)
@@ -71,8 +72,8 @@ def t_update_by_template():
     }
 
     key_cols = ['playerID', 'teamID', 'yearID', 'stint']
-    tmp = {'teamID': 'BOS', 'yearID': '1960'}
-    new_vals = {'yearID': '2020'}
+    tmp = {'teamID': 'HOU', 'yearID': '1990'}
+    new_vals = {'stint': '2'}
 
     csv_tbl = CSVDataTable("batting", connect_info, key_columns=key_cols)
 
@@ -88,7 +89,7 @@ def t_update_by_key():
     }
 
     key_cols = ['playerID', 'teamID', 'yearID', 'stint']
-    key_vals = ['willite01', 'BOS', '1960', '1']
+    key_vals = ['willite01', 'BOS', '1950', '1']
     new_vals = {'yearID': '2020'}
 
     csv_tbl = CSVDataTable("batting", connect_info, key_columns=key_cols)
@@ -105,7 +106,7 @@ def t_delete_by_template():
     }
 
     key_cols = ['playerID', 'teamID', 'yearID', 'stint']
-    tmp = {'teamID': 'BOS', 'yearID': '1970'}
+    tmp = {'yearID': '1900'}
 
     csv_tbl = CSVDataTable("batting", connect_info, key_columns=key_cols)
 
@@ -120,14 +121,15 @@ def t_delete_by_key():
         "file_name": "Batting.csv"
     }
 
-    key_cols = ['teamID', 'yearID', 'stint']
-    key_vals = ['BOS', '1970', '1']
+    key_cols = ['playerID', 'teamID']
+    key_vals = ['bowerfr01', 'PIT']  # one-to-one map between 'key_cols' and 'key_vals', modify them together
 
     csv_tbl = CSVDataTable("batting", connect_info, key_columns=key_cols)
 
     cnt = csv_tbl.delete_by_key(key_fields=key_vals)
 
     print("Number of rows deleted:", cnt)
+
 
 # t_find_by_template()
 # t_find_by_primary_key()

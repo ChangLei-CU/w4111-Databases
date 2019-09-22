@@ -147,15 +147,11 @@ class CSVDataTable(BaseDataTable):
 
     def delete_by_key(self, key_fields):
         """
-        Deletes the record that matches the key.
-        :param template: A template.
+        :param key_fields: List of value for the key fields. Deletes the record that matches the key.
         :return: A count of the rows deleted.
         """
-        count = 0
-        result = self.find_by_primary_key(key_fields=key_fields)
-        for r in result:
-            self._rows.remove(r)
-            count += 1
+        tmp = dict(zip(self._data['key_columns'], key_fields))
+        count = self.delete_by_template(template=tmp)
 
         return count
 
@@ -178,12 +174,8 @@ class CSVDataTable(BaseDataTable):
         :param new_values: A dict of field:value to set for updated row.
         :return: Number of rows updated.
         """
-        count = 0
-        results = self.find_by_primary_key(key_fields=key_fields)
-        for r in results:
-            for k, v in new_values.items():
-                r[k] = v
-            count += 1
+        tmp = dict(zip(self._data['key_columns'], key_fields))
+        count = self.update_by_template(template=tmp, new_values=new_values)
 
         return count
 
@@ -197,8 +189,11 @@ class CSVDataTable(BaseDataTable):
         for r in self._rows:
             if self.matches_template(r, template):
                 for k, v in new_values.items():
-                    r[k] = v
-                count += 1
+                    if r[k] != v:
+                        count += 1
+                        r[k] = v
+                    else:
+                        continue
 
         return count
 

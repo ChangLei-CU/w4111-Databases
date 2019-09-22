@@ -234,7 +234,7 @@ class RDBDataTable(BaseDataTable):
         sql = "select " + fields + " from " + self._data["table_name"] + " " + w_clause
         _, result = run_q(sql=sql, args=args, conn=self._cnx)
 
-        return result
+        return [dict(zip(field_list, r)) for r in result]
 
     def delete_by_key(self, key_fields):
         """
@@ -251,12 +251,11 @@ class RDBDataTable(BaseDataTable):
         :param template: Template to determine rows to delete.
         :return: Number of rows deleted.
         """
-        result = self.find_by_template(template, self._data["key_columns"])
         w_clause, args = template_to_where_clause(template)
         sql = "delete from " + self._data["table_name"] + " " + w_clause
-        run_q(sql=sql, args=args, conn=self._cnx)
+        row_num, _ = run_q(sql=sql, args=args, conn=self._cnx)
 
-        return len(result)
+        return row_num
 
     def update_by_key(self, key_fields, new_values):
         """
@@ -275,11 +274,10 @@ class RDBDataTable(BaseDataTable):
         :param new_values: New values to set for matching fields.
         :return: Number of rows updated.
         """
-        result = self.find_by_template(template, self._data["key_columns"])
         sql, args = create_update(self._data["table_name"], new_values, template)
-        run_q(sql=sql, args=args, conn=self._cnx)
+        row_num, _ = run_q(sql=sql, args=args, conn=self._cnx)
 
-        return len(result)
+        return row_num
 
     def insert(self, new_record):
         """
