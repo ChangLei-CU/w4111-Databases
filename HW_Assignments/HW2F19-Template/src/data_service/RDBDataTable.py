@@ -42,7 +42,7 @@ class RDBDataTable():
     _default_connect_info = {
         'host': 'localhost',
         'user': 'root',
-        'password': 'dbuserdbuser',
+        'password': '006121',
         'db': 'lahman2019clean',
         'port': 3306
     }
@@ -127,6 +127,14 @@ class RDBDataTable():
         """
 
         # -- TO IMPLEMENT --
+        row_count = self._row_count
+        if row_count is None:
+            sql = "select count(*) as count from " + self._table_name
+            res, d = dbutils.run_q(sql, args=None, fetch=True, conn=self._cnx, commit=True)
+            row_count = d[0]['count']
+            self._row_count = row_count
+
+        return row_count
 
     def get_primary_key_columns(self):
         """
@@ -138,6 +146,15 @@ class RDBDataTable():
 
         # Hint. Google "get primary key columns mysql"
         # Hint. THE ORDER OF THE COLUMNS IN THE KEY DEFINITION MATTERS.
+        key_columns = self._key_columns
+        if key_columns is None:
+            sql = "show keys from " + self._table_name + " where key_name = 'primary'"
+            res, d = dbutils.run_q(sql, args=None, fetch=True, conn=self._cnx, commit=True)
+            key_columns = [t['Column_name'] for t in d]
+            self._key_columns = key_columns
+
+        return key_columns
+
 
     def get_sample_rows(self, no_of_rows=_rows_to_print):
         """

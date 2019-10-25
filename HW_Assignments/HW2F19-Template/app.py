@@ -185,7 +185,10 @@ def dbs():
     """
     # -- TO IMPLEMENT --
 
-    # Your code  goes here.
+    rsp_data = dta.get_databases()
+    rsp_str = json.dumps(rsp_data)
+    rsp = Response(rsp_str, status=200, content_type="application/json")
+    return rsp
 
     # Hint: Implement the function in data_table_adaptor
     #
@@ -196,13 +199,16 @@ def dbs():
 def tbls(dbname):
     """
 
-    :param dbname: The name of a database/sche,a
+    :param dbname: The name of a database/schema
     :return: List of tables in the database.
     """
 
     inputs = log_and_extract_input(dbs, None)
 
-    # Your code  goes here.
+    rsp_data = dta.get_tables(dbname=dbname)
+    rsp_str = json.dumps(rsp_data)
+    rsp = Response(rsp_str, status=200, content_type="application/json")
+    return rsp
 
     # Hint: Implement the function in data_table_adaptor
     #
@@ -225,31 +231,39 @@ def resource_by_id(dbname, resource, primary_key):
         context = log_and_extract_input(resource_by_id, (dbname, resource, primary_key))
 
         #
-        # SOME CODE GOES HERE
+        table = dta.get_rdb_table(resource, dbname)
+        key_vals = primary_key.split('_')
+        fields = get_field_list(context)
         #
         # -- TO IMPLEMENT --
 
         if request.method == 'GET':
 
             #
-            # SOME CODE GOES HERE
+            rsp_data = table.find_by_primary_key(key_fields=key_vals, field_list=fields)
+            rsp_str = json.dumps(rsp_data, indent=2, default=str)
+            result = Response(rsp_str, status=200, content_type="application/json")
+            return result
             #
             # -- TO IMPLEMENT --
-            pass
 
         elif request.method == 'DELETE':
             #
-            # SOME CODE GOES HERE
+            rsp_data = table.delete_by_key(key_fields=key_vals)
+            msg = ("Number of rows deleted: \n", json.dumps(rsp_data, indent=2, default=str))
+            result = Response(msg, status=200, content_type="application/json")
+            return result
             #
             # -- TO IMPLEMENT --
-            pass
 
         elif request.method == 'PUT':
             #
-            # SOME CODE GOES HERE
+            rsp_data = table.update_by_key(key_fields=key_vals, new_values=context['body'])
+            msg = ("Number of rows updated: \n", json.dumps(rsp_data, indent=2, default=str))
+            result = Response(msg, status=200, content_type="application/json")
+            return result
             #
             # -- TO IMPLEMENT --
-            pass
 
     except Exception as e:
         print(e)
@@ -265,24 +279,33 @@ def get_resource(dbname, resource_name):
         context = log_and_extract_input(get_resource, (dbname, resource_name))
 
         #
-        # SOME CODE GOES HERE
+        table = dta.get_rdb_table(resource_name, dbname)
+        template = context['query_params']
+        fields = get_field_list(context)
         #
         # -- TO IMPLEMENT --
 
 
         if request.method == 'GET':
             #
-            # SOME CODE GOES HERE
+            rsp_data = table.find_by_template(template=template, field_list=fields)
+            rsp_str = json.dumps(rsp_data, indent=2, default=str)
+            result = Response(rsp_str, status=200, content_type="application/json")
+            return result
             #
             # -- TO IMPLEMENT --
-            pass
 
         elif request.method == 'POST':
             #
-            # SOME CODE GOES HERE
+            rsp_data = table.insert(new_record=context['body'])
+            if rsp_data:
+                msg = "HTTP: 200 Entry successfully inserted"
+            else:
+                msg = "Insertion failure"
+            result = Response(msg, status=200, content_type="application/json")
+            return result
             #
             # -- TO IMPLEMENT --
-            pass
         else:
             result = "Invalid request."
             return result, 400, {'Content-Type': 'text/plain; charset=utf-8'}
